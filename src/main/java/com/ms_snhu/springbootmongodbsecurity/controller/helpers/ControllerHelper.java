@@ -118,9 +118,14 @@ public class ControllerHelper {
 		httpServletResponse.setStatus(302);
 	}
 	
+	/**
+	 * Convert the data contained in a csvRecord object into a Stocks object
+	 * 
+	 * @param csvRecord
+	 * @return
+	 * @throws ParseException
+	 */
 	private Stocks stockFromCsvRecord(CSVRecord csvRecord) throws ParseException {
-		
-		
 		
 		Stocks stock = new Stocks();
 		stock.set_id(ObjectId.get().toString());
@@ -193,7 +198,6 @@ public class ControllerHelper {
 			
 		return stock;
 	}
-	
 	private Double parseDoubleNullSafe(String stringToParse){
 		return StringUtils.isEmpty(stringToParse) ? null : Double.parseDouble(stringToParse);
 	}

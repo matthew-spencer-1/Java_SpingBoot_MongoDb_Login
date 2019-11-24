@@ -52,20 +52,19 @@ public class MarketWebController {
 	@Autowired
 	private MarketRepository marketRepository;
 
-	@Value("${spring.session.mongodb.collection-name}")
-	private String collectionName;
 	@Value("${snhu.dateFormat}")
 	private String dateFormat;
-
 
 	@GetMapping(value = "/dashboard")
     public ModelAndView dashboard() {
         ModelAndView modelAndView = new ModelAndView();
         
+        String stocksCollectionName = marketTemplate.getCollectionName(Stocks.class);
+        
         List<String> industries = marketHelper
-				.convertIterableToList(marketTemplate.getCollection(collectionName).distinct("Industry", String.class));
+				.convertIterableToList(marketTemplate.getCollection(stocksCollectionName).distinct("Industry", String.class));
 		List<String> sectors = marketHelper
-				.convertIterableToList(marketTemplate.getCollection(collectionName).distinct("Sector", String.class));
+				.convertIterableToList(marketTemplate.getCollection(stocksCollectionName).distinct("Sector", String.class));
         
         User user = marketHelper.getAuthenticatedUser();
         modelAndView.addObject("currentUser", user);
@@ -84,13 +83,15 @@ public class MarketWebController {
 	public String industryPerformance(@RequestParam(name = "industry", required = true) String industry,
 			@RequestParam(name = "performers", required = true) Integer performers, Model model) {
 
+		String stocksCollectionName = marketTemplate.getCollectionName(Stocks.class);
+		
 		List<String> industries = marketHelper
-				.convertIterableToList(marketTemplate.getCollection(collectionName).distinct("Industry", String.class));
+				.convertIterableToList(marketTemplate.getCollection(stocksCollectionName).distinct("Industry", String.class));
 
 		Sort performanceSort = new Sort(Sort.Direction.DESC, "Performance (YTD)");
 		Query industryQuery = new Query(Criteria.where("Industry").is(industry)).with(performanceSort)
 				.limit(performers);
-		List<Stocks> stocks = marketTemplate.find(industryQuery, Stocks.class, collectionName);
+		List<Stocks> stocks = marketTemplate.find(industryQuery, Stocks.class, stocksCollectionName);
 
 		User user = marketHelper.getAuthenticatedUser();
 
@@ -110,10 +111,12 @@ public class MarketWebController {
 	public String movingAverage(@RequestParam(name = "lowerBound", required = true) Double lowerBound,
 			@RequestParam(name = "upperBound", required = true) Double upperBound, Model model) {
 
+		String stocksCollectionName = marketTemplate.getCollectionName(Stocks.class);
+		
 		Sort smaSort = new Sort(Sort.Direction.ASC, "50-Day Simple Moving Average");
 		Query fiftyDayQuery = new Query(Criteria.where("50-Day Simple Moving Average").gt(lowerBound).lt(upperBound))
 				.with(smaSort);
-		List<Stocks> stocks = marketTemplate.find(fiftyDayQuery, Stocks.class, collectionName);
+		List<Stocks> stocks = marketTemplate.find(fiftyDayQuery, Stocks.class, stocksCollectionName);
 
 		User user = marketHelper.getAuthenticatedUser();
 
@@ -173,6 +176,8 @@ public class MarketWebController {
 	 */
 	@GetMapping("/sectorOutstandingShares")
 	private String sectorAggregation(@RequestParam(name = "sector", required = true) String sectorName, Model model) {
+		String stocksCollectionName = marketTemplate.getCollectionName(Stocks.class);
+		
 		/* Create the match Operation */
 		MatchOperation sectorMatchOp = Aggregation.match(new Criteria("Sector").is(sectorName));
 		/* Create the group Operation */
@@ -183,7 +188,7 @@ public class MarketWebController {
 
 		/* Run the Aggregation */
 		AggregationResults<SectorIndustryOutstandingShares> aggResults = marketTemplate
-				.aggregate(sectorIndustryAggregation, collectionName, SectorIndustryOutstandingShares.class);
+				.aggregate(sectorIndustryAggregation, stocksCollectionName, SectorIndustryOutstandingShares.class);
 		List<SectorIndustryOutstandingShares> sharesResults = aggResults.getMappedResults();
 		
 		User user = marketHelper.getAuthenticatedUser();

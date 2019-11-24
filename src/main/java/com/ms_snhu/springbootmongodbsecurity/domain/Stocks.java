@@ -5,6 +5,9 @@ import java.util.Date;
 import org.mongojack.ObjectId;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.index.IndexDirection;
+import org.springframework.data.mongodb.core.index.Indexed;
+import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
@@ -19,6 +22,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  *
  */
 @JsonInclude(Include.NON_EMPTY)
+@Document(collection = "stocks")
 public class Stocks {
 	
 	@Value("${snhu.dateFormat}")
@@ -30,6 +34,7 @@ public class Stocks {
 
 	@Field("Ticker")
 	@JsonProperty("Ticker")
+	@Indexed(unique = true, direction = IndexDirection.DESCENDING, dropDups = true)
 	private String ticker;
 	@Field("Company")
 	@JsonProperty("Company")
