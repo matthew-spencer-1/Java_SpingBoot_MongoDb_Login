@@ -1,0 +1,129 @@
+<!DOCTYPE HTML>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org" 
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{default}">
+<head>
+    <title>SNHU Stock Market Analysis Application</title>
+    <script type="text/javascript" src="js/convertToJson.js"></script>
+    <script th:inline="javascript">
+    	/*<![CDATA[*/
+    	function prepareAndSubmit(){
+    		var intent = /*[[${insertUpdate}]]*/;
+    		convertToJsonAndSubmit(intent, document.getElementById('stockUpdateForm'))
+    	}
+    	/*]]>*/
+    </script>
+</head>
+<body>
+	<div layout:fragment="content">
+		<h3 th:text="${insertUpdate} + ' Stock Record'"></h3>
+		<form id="stockUpdateForm" onsubmit="prepareAndSubmit()" action="/dashboard">
+		<table>
+			<tr><td></td><td><input type="hidden" id="_id" th:value="${stock._id}"></td><td></td><td></td></tr>
+			<tr><td>Ticker</td><td><input type="text" id="Ticker" th:value="${stock.ticker}"></td>
+				<td>Company</td><td><input type="text" id="Company" th:value="${stock.companyName }"></td>
+			</tr>
+			<tr><td>Sector</td><td><input type="text" id="Sector" th:value="${stock.sector }"></td>
+				<td>Industry</td><td><input type="text" id="Industry" th:value="${stock.industry }"></td>
+			</tr>
+			<tr><td>Country</td><td><input type="text" id="Country" th:value="${stock.country}"></td>
+				<td>Price</td><td><input type="text" id="Price" th:value="${stock.price}">
+			</td>
+			<tr><td>Earnings Date</td><td><input type="text" id="Earnings Date" th:value="${#dates.format(stock.earningsDate, dateFormat)}"></td>
+				<td>50-Day Low</td><td><input type="text" id="50-Day Low" th:value="${stock.low50Day}"></td>
+			</tr>
+			<tr><td>50-Day High</td><td><input type="text" id="50-Day High" th:value="${stock.high50Day}"></td>
+				<td>20-Day Simple Moving Average</td><td><input type="text" id="20-Day Simple Moving Average" th:value="${stock.simpleMovingAverage20day}"></td>
+			</tr>
+			<tr><td>50-Day Simple Moving Average</td><td><input type="text" id="50-Day Simple Moving Average" th:value="${stock.simpleMovingAverage50day}"></td>
+				<td>200-Day Simple Moving Average</td><td><input type="text" id="200-Day Simple Moving Average" th:value="${stock.simpleMovingAverage200Day}"></td>
+			</tr>
+			<tr><td>52-Week Low</td><td><input type="text" id="52-Week Low" th:value="${stock.low52week}"></td>
+				<td>52-Week High</td><td><input type="text" id="52-Week High" th:value="${stock.high52Week }"></td>
+			</tr>
+			<tr><td>Analyst Recom</td><td><input type="text" id="Analyst Recom" th:value="${stock.analyistRecom}"></td>
+				<td>Average True Range</td><td><input type="text" id="Average True Range" th:value="${stock.averageTrueRange}"></td>
+			</tr>
+			<tr><td>Average Volume</td><td><input type="text" id="Average Volume" th:value="${stock.averageVolume}"></td>
+				<td>Beta</td><td><input type="text" id="Beta" th:value="${stock.beta}"></td>
+			</tr>
+			<tr><td>Change</td><td><input type="text" id="Change" th:value="${stock.change}"></td>
+				<td>Change from Open</td><td><input type="text" id="Change from Open" th:value="${stock.changeFromOpen}"></td>
+			</tr>
+			<tr><td>Current Ratio</td><td><input type="text" id="Current Ratio" th:value="${stock.currentRatio}"></td>
+				<td>Dividend Yield</td><td><input type="text" id="Dividend Yield" th:value="${stock.dividendYield}"></td>
+			</tr>
+			<tr><td>EPS (ttm)</td><td><input type="text" id="EPS (ttm)" th:value="${stock.epsTtm}"></td>
+				<td>EPS growth next year</td><td><input type="text" id="EPS growth next year" th:value="${stock.epsGrowthOneYear}"></td>
+			</tr>
+			<tr><td>EPS growth next 5 years</td><td><input type="text" id="EPS growth next 5 years" th:value="${stock.epsGrowth5years}"></td>
+				<td>EPS growth this year</td><td><input type="text" id="EPS growth this year" th:value="${stock.epsGrowthYear}"></td>
+			</tr>
+			<tr><td>EPS growth past 5 years</td><td><input type="text" id="EPS growth past 5 years" th:value="${stock.eps5yeargrowth}"></td>
+				<td>EPS growth quarter over quarter</td><td><input type="text" id="EPS growth quarter over quarter" th:value="${stock.epsGrowthQuarterOver}"></td>
+			</tr>
+			<tr><td>Float Short</td><td><input type="text" id="Float Short" th:value="${stock.floatShort}"></td>
+				<td>Forward P/E</td><td><input type="text" id="Forward P/E" th:value="${stock.forwardPe}"></td>
+			</tr>
+			<tr><td>Gap</td><td><input type="text" id="Gap" th:value="${stock.gap}"></td>
+				<td>Gross Margin</td><td><input type="text" id="Gross Margin" th:value="${stock.grossMargin }"></td>
+			</tr>
+			<tr><td>Insider Ownership</td><td><input type="text" id="Insider Ownership" th:value="${stock.insiderOwnership}"></td>
+				<td>Insider Transactions</td><td><input type="text" id="Insider Transactions" th:value="${stock.insiderTransactions}"></td>
+			</tr>
+			<tr><td>Institutional Ownership</td><td><input type="text" id="Institutional Ownership" th:value="${stock.institutionalOwnership}"></td>
+				<td>Institutional Transactions</td><td><input type="text" id="Institutional Transactions" th:value="${stock.institutionalTransactions}"></td>
+			</tr>
+			<tr><td>LT Debt/Equity</td><td><input type="text" id="LT Debt/Equity" th:value="${stock.ltDebtEquity}"></td>
+				<td>Market Cap</td><td><input type="text" id="Market Cap" th:value="${stock.marketCap}"></td>
+			</tr>
+			<tr><td>Operating Margin</td><td><input type="text" id="Operating Margin" th:value="${stock.operatingMargin}"></td>
+				<td>P/B</td><td><input type="text" id="P/B" th:value="${stock.pb}"></td>
+			</tr>
+			<tr><td>P/Cash</td><td><input type="text" id="P/Cash" th:value="${stock.pCash}"></td>
+				<td>P/E</td><td><input type="text" id="P/E" th:value="${stock.pe}"></td>
+			</tr>
+			<tr><td>P/Free Cash Flow</td><td><input type="text" id="P/Free Cash Flow" th:value="${stock.pFreeCashFlow}"></td>
+				<td>P/S</td><td><input type="text" id="P/S" th:value="${stock.ps}"></td>
+			</tr>
+			<tr><td>Payout Ratio</td><td><input type="text" id="Payout Ratio" th:value="${stock.payoutRatio}"></td>
+				<td>PEG</td><td><input type="text" id="PEG" th:value="${stock.peg}"></td>
+			</tr>
+			<tr><td>Performance (Week)</td><td><input type="text" id="Performance (Week)" th:value="${stock.performanceWeek}"></td>
+				<td>Performance (Month)</td><td><input type="text" id="Performance (Month)" th:value="${stock.performanceMonth}"></td>
+			</tr>
+			<tr><td>Performance (Quarter)</td><td><input type="text" id="Performance (Quarter)" th:value="${stock.performanceQuarter}"></td>
+				<td>Performance (Half Year)</td><td><input type="text" id="Performance (Half Year)" th:value="${stock.performanceHalfYear}"></td>
+			</tr>
+			<tr><td>Performance (Year)</td><td><input type="text" id="Performance (Year)" th:value="${stock.performanceYear}"></td>
+				<td>Performance (YTD)</td><td><input type="text" id="Performance (YTD)" th:value="${stock.performanceYTD}"></td>
+			</tr>
+			<tr><td>Profit Margin</td><td><input type="text" id="Profit Margin" th:value="${stock.profitMargin}"></td>
+				<td>Quick Ratio</td><td><input type="text" id="Quick Ratio" th:value="${stock.quickRatio}"></td>
+			</tr>
+			<tr><td>Relative Strength Index (14)</td><td><input type="text" id="Relative Strength Index (14)" th:value="${stock.rsi14}"></td>
+				<td>Relative Volume</td><td><input type="text" id="Relative Volume" th:value="${stock.relativeVolume}"></td>
+			</tr>
+			<tr><td>Return on Assets</td><td><input type="text" id="Return on Assets" th:value="${stock.returnOnAssets}"></td>
+				<td>Return on Equity</td><td><input type="text" id="Return on Equity" th:value="${stock.returnOnEquity}"></td>
+			</tr>
+			<tr><td>Return on Investment</td><td><input type="text" id="Return on Investment" th:value="${stock.returnOnInvestment}"></td>
+				<td>Sales growth past 5 years</td><td><input type="text" id="Sales growth past 5 years" th:value="${stock.salesGrowthPastFiveYears}"></td>
+			</tr>
+			<tr><td>Sales growth quarter over quarter</td><td><input type="text" id="Sales growth quarter over quarter" th:value="${stock.salesGrowthQuarterOver}"></td>
+				<td>Shares Float</td><td><input type="text" id="Shares Float" th:value="${stock.sharesFloat}"></td>
+			</tr>
+			<tr><td>Shares Outstanding</td><td><input type="text" id="Shares Outstanding" th:value="${stock.sharesOutstanding}"></td>
+				<td>Short Ratio</td><td><input type="text" id="Short Ratio" th:value="${stock.shortRatio}"></td>
+			</tr>
+			<tr><td>Total Debt/Equity</td><td><input type="text" id="Total Debt/Equity" th:value="${stock.totalDebtEquity}"></td>
+				<td>Volatility (Week)</td><td><input type="text" id="Volatility (Week)" th:value="${stock.volatilityWeek}"></td>
+			</tr>
+			<tr><td>Volatility (Month)</td><td><input type="text" id="Volatility (Month)" th:value="${stock.volatilityMonth}"></td>
+				<td>Volume</td><td><input type="text" id="Volume" th:value="${stock.volume}"></td>
+			</tr>
+		</table>
+		<button class="btn btn-lg btn-primary btn-block" type="submit">Save Stock</button>
+		</form>
+	</div>
+</body>	
+</html>

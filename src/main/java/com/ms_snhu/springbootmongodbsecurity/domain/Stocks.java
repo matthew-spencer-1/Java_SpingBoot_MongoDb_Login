@@ -2,7 +2,7 @@ package com.ms_snhu.springbootmongodbsecurity.domain;
 
 import java.util.Date;
 
-import org.bson.types.ObjectId;
+import org.mongojack.ObjectId;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Field;
@@ -25,7 +25,8 @@ public class Stocks {
 	private String dateFormat;
 
 	@Id
-	private ObjectId _id;
+	@ObjectId
+	private String _id;
 
 	@Field("Ticker")
 	@JsonProperty("Ticker")
@@ -235,11 +236,11 @@ public class Stocks {
 	@JsonProperty("50-Day Simple Moving Average")
 	private Double simpleMovingAverage50day;
 
-	public ObjectId get_id() {
+	public String get_id() {
 		return _id;
 	}
 
-	public void set_id(ObjectId _id) {
+	public void set_id(String _id) {
 		this._id = _id;
 	}
 

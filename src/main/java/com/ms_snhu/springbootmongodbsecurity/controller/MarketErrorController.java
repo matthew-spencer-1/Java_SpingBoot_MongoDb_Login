@@ -1,11 +1,14 @@
 package com.ms_snhu.springbootmongodbsecurity.controller;
 
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.web.servlet.error.ErrorController;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+
+import com.ms_snhu.springbootmongodbsecurity.controller.helpers.ControllerHelper;
+
 
 /**
  * MarketErrorController
@@ -18,8 +21,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 @Controller
 public class MarketErrorController implements ErrorController {
 
-	@Value("${snhu.studentName}")
-	private String studentName;
+	@Autowired
+	ControllerHelper controllerHelper;
 
 	/**
 	 * handleError handles the error by attaching the error message to the model and
@@ -37,7 +40,7 @@ public class MarketErrorController implements ErrorController {
 			Model model) {
 
 		model.addAttribute("message", message);
-		model.addAttribute("name", studentName);
+		model.addAttribute("name", controllerHelper.getAuthenticatedUser().getFullname());
 
 		return "error";
 	}

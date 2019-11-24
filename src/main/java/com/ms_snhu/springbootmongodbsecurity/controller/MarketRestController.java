@@ -44,7 +44,7 @@ public class MarketRestController {
 	@RequestMapping(value = "/Insert", method = RequestMethod.POST)
 	public Stocks createStock(@Valid @RequestBody Stocks stockToCreate) {
 		if (StringUtils.isEmpty(stockToCreate.get_id())) {
-			stockToCreate.set_id(ObjectId.get());
+			stockToCreate.set_id(ObjectId.get().toString());
 		}
 
 		marketRepository.insert(stockToCreate);
@@ -56,7 +56,7 @@ public class MarketRestController {
 	public List<Stocks> createMultipleStocks(@Valid @RequestBody List<Stocks> stocksToCreate) {
 		for (Stocks stock : stocksToCreate) {
 			if (StringUtils.isEmpty(stock.get_id())) {
-				stock.set_id(ObjectId.get());
+				stock.set_id(ObjectId.get().toString());
 			}
 		}
 
@@ -73,10 +73,10 @@ public class MarketRestController {
 		try {
 			stocksToSave = marketHelper.convertJSONToStocks(uploadfile.getInputStream());
 		} catch (IOException e) {
-			this.redirectToError(httpServletResponse, e.getLocalizedMessage());
+			marketHelper.redirectToError(httpServletResponse, e.getMessage());
 		}
 		if (fromWeb.isPresent() && fromWeb.get()) {
-			this.redirectToDashboard(httpServletResponse);
+			marketHelper.redirectToDashboard(httpServletResponse);
 		}
 
 		marketRepository.saveAll(stocksToSave);
@@ -108,11 +108,11 @@ public class MarketRestController {
 			HttpServletResponse httpServletResponse) {
 		Stocks stockToDelete = marketRepository.findByTicker(ticker);
 		if (null == stockToDelete) {
-			this.redirectToError(httpServletResponse, "Unable to find Stock with ticker Id: " + ticker + ".");
+			marketHelper.redirectToError(httpServletResponse, "Unable to find Stock with ticker Id: " + ticker + ".");
 		} else {
 			marketRepository.delete(stockToDelete);
 			if (fromWeb.isPresent() && fromWeb.get()) {
-				this.redirectToDashboard(httpServletResponse);
+				marketHelper.redirectToDashboard(httpServletResponse);
 			}
 		}
 	}
@@ -132,26 +132,5 @@ public class MarketRestController {
 	public List<Stocks> getTopFiveInIndustry(@RequestParam("industry") String industryType) {
 
 		return marketRepository.findTop5ByIndustryInOrderByPerformanceYTDDesc(industryType);
-	}
-
-	/**
-	 * Trigger redirect from RESTful service to http web service dashboard
-	 * 
-	 * @param httpServletResponse
-	 */
-	private void redirectToDashboard(HttpServletResponse httpServletResponse) {
-		httpServletResponse.setHeader("Location", "/dashboard");
-		httpServletResponse.setStatus(302);
-	}
-
-	/**
-	 * Trigger redirect from RESTful service to http web service error page
-	 * 
-	 * @param httpServletResponse
-	 * @param messageText
-	 */
-	private void redirectToError(HttpServletResponse httpServletResponse, String messageText) {
-		httpServletResponse.setHeader("Location", "/error?message=" + messageText);
-		httpServletResponse.setStatus(302);
 	}
 }

@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{default}">
+<head>
+<meta charset="UTF-8">
+    <title>SNHU Stock Market Analysis Application</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+</head>
+<body>
+	<div layout:fragment="content">
+	<h2 th:text="'Outstanding Shares For ' + ${sectorName} + ' Sector'">/</h2>
+	<table>
+		<thead>
+			<tr>
+				<td>Industry Name</td>
+				<td>Outstanding Shares</td>
+			</tr>
+		</thead>
+		<tbody>
+			<tr th:each="industry, iStat : ${outstandingShares}"
+				th:style="${iStat.odd}? 'background-color: #A0CFEC'">
+				<td th:text="${industry._id}"/>
+				<td th:text="${industry.total}"/>
+			</tr>
+		</tbody>
+	</table>
+	</div>
+</body>
+</html>

@@ -1,13 +1,114 @@
 <!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org" 
-      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{default}">
-    <head>
-        <title>Dashboard</title>
-    </head>
-    <body>
-        <div layout:fragment="content">
-            <h1 th:inline="text">Hello [[${#httpServletRequest.remoteUser}]]!</h1>
-            <h2>This is your Admin Dashboard</h2>
-        </div>
-    </body>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{default}">
+<head>
+<title>Dashboard</title>
+</head>
+<body>
+	<div layout:fragment="content">
+		<h1 th:inline="text">Hello [[${fullName}]]!</h1>
+		<h2 th:if="${!isFiftyDay && !isIndustry}">This is your Admin Dashboard</h2>
+
+		<div th:if="${!isFiftyDay && !isIndustry}">
+			<p>
+				<a href="/insertNewStock">Insert New Stock</a>
+			</p>
+			<form action="/UploadCsvFile" method="post"
+				enctype="multipart/form-data">
+				<b>Upload New Stock Data (CSV)</b> 
+				<input type="hidden" name="fromWeb" value="true"> 
+				<input type="file" name="file" accept="*.csv">
+				<button class="btn btn-sm btn-primary" type="submit">Upload File</button>		
+			</form>
+			<form action="/UploadFile" method="post"
+				enctype="multipart/form-data">
+				<b>Upload New Stock Data (JSON)</b> 
+				<input type="hidden" name="fromWeb" value="true"> 
+				<input type="file" name="file" accept="*.json">
+				<button class="btn btn-sm btn-primary" type="submit">Upload File</button>		
+			</form>
+			<br> <br>
+			<form action="/updateStock">
+				<b>Update Existing Stock Information</b><br /> Stock Ticker: 
+				<input type="text" name="ticker">
+				<button class="btn btn-sm btn-primary" type="submit">Update Stock</button>
+			</form>
+			<br> <br>
+			<form action="/delete">
+				<b>Delete Existing Stock Information</b><br> Stock Ticker: 
+				<input type="hidden" name="fromWeb" value="true">
+				<input type="text" name="Ticker">
+				<button class="btn btn-sm btn-primary" type="submit">Delete Stock</button>
+			</form>
+		</div>
+		<br>
+		<div th:if="${!isFiftyDay && !industries.empty}">
+			<form action="/industryPerformance">
+				<b>Year to Date Industry Performance Search</b><br /> 
+					<select name="industry">
+					<option th:if="${industry == null}"
+						th:selected="${industry == null}">Select Industry</option>
+					<option th:each="i: ${industries}" th:value="${i}" th:text="${i}"
+						th:selected="(${i == industry})"></option>
+				</select>
+				<select name="performers">
+					<option value="5" title="Top 5 Performers"
+						th:selected="${performers == 5}">Top 5 Performers</option>
+					<option value="10" title="Top 10 Performers">Top 10
+						Performers</option>
+				</select> 
+				<button class="btn btn-sm btn-primary" type="submit">Search Performers</button>
+			</form>
+		</div>
+		<br>
+		<div th:if="${!isIndustry}">
+			<form action="/fiftyDayMovingAverage">
+				<b>Search 50-Day Simple Moving Average</b><br />
+				Lower Bound for Range: <input type="text" name="lowerBound" th:value="${lowerBound}">
+				Upper Bound For Range: <input type="text" name="upperBound" th:value="${upperBound}"> 
+				<button class="btn btn-sm btn-primary" type="submit">Search 50-Day SMA</button>	
+			</form>
+		</div>
+		<br />
+		<div th:if="${!isFiftyDay && !isIndustry && !sectors.empty}">
+			<form action="/sectorOutstandingShares">
+				<b>Search Outstanding Shares by Sector</b><br /> <select
+					name="sector">
+					<option th:if="${sector == null}" th:selected="${sector == null}">Select
+						Sector</option>
+					<option th:each="i: ${sectors}" th:value="${i}" th:text="${i}"
+						th:selected="(${i == sector})"></option>
+				</select> 
+				<button class="btn btn-sm btn-primary" type="submit">Search Outstanding Shares</button>
+			</form>
+		</div>
+		<br/>
+		<div th:if="${stocks != null}">
+			<table>
+				<thead style="font-weight: bold; background:">
+					<tr>
+						<td></td>
+						<td>Stock Ticker</td>
+						<td>Company Name</td>
+						<td>YTD Performance</td>
+						<td>Current Price</td>
+						<td th:if="${isFiftyDay}">50-Day SMA</td>
+					</tr>
+				</thead>
+				<tr th:each="stock, iStat : ${stocks}"
+					th:style="${iStat.odd}? 'background-color: #A0CFEC'">
+					<td th:text="${iStat.index}+1">.&nbsp;</td>
+					<td th:text="${stock.ticker}" />
+					<td th:text="${stock.companyName}" />
+					<td th:text="${stock.performanceYTD}" />
+					<td th:text="${stock.price}" />
+					<td th:if="${isFiftyDay}"
+						th:text="${stock.simpleMovingAverage50day}" />
+				</tr>
+			</table>
+		</div>
+	</div>
+</body>
 </html>
