@@ -33,6 +33,7 @@ import com.ms_snhu.springbootmongodbsecurity.domain.SectorIndustryOutstandingSha
 import com.ms_snhu.springbootmongodbsecurity.domain.Stocks;
 import com.ms_snhu.springbootmongodbsecurity.domain.User;
 import com.ms_snhu.springbootmongodbsecurity.repository.MarketRepository;
+import com.ms_snhu.springbootmongodbsecurity.repository.RoleRepository;
 
 /**
  * Controller Class for HTTP web services
@@ -51,11 +52,13 @@ public class MarketWebController {
 	private ControllerHelper marketHelper;
 	@Autowired
 	private MarketRepository marketRepository;
+	@Autowired
+	private RoleRepository roleRpository;
 
 	@Value("${snhu.dateFormat}")
 	private String dateFormat;
 
-	@GetMapping(value = "/dashboard")
+	@GetMapping(value = {"/dashboard","/userView"})
     public ModelAndView dashboard() {
         ModelAndView modelAndView = new ModelAndView();
         
@@ -74,7 +77,11 @@ public class MarketWebController {
         modelAndView.addObject("sectors",sectors);
         modelAndView.addObject("isFiftyDay",false);
         modelAndView.addObject("isIndustry",false);
-        modelAndView.setViewName("dashboard");
+        if(user.getRoles().contains(roleRpository.findByRole("ADMIN"))) {
+        	modelAndView.setViewName("dashboard");
+        } else {
+        	modelAndView.setViewName("userView");
+        }
         return modelAndView;
     }
 	
@@ -201,6 +208,14 @@ public class MarketWebController {
 		return "outstandingShares.html";
 	}
 	
+	/**
+	 * method to facilitate the uploading of data contained in csv files to the stocks collection
+	 * 
+	 * @param uploadfile
+	 * @param fromWeb
+	 * @param httpServletResponse
+	 * @return
+	 */
 	@RequestMapping(value = "/UploadCsvFile", method = RequestMethod.POST, produces = MediaType.TEXT_PLAIN_VALUE)
 	public ModelAndView updloadStocksCsv(@RequestParam("file") MultipartFile uploadfile,
 			@RequestParam(name = "fromWeb", required = false) Optional<Boolean> fromWeb,
