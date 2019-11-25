@@ -19,7 +19,7 @@
                 <ul class="navbar-nav mr-auto">
                     <li class="nav-item active">
                         <a class="nav-link" th:if="${currentUser == null}" href="/">Home <span class="sr-only">(current)</span></a>
-                    	<a class="nav-link" th:if="${currentUser}" href="/dashboard">Dashboard <span class="sr-only">(current)</span></a>
+                    	<a class="nav-link" th:if="${currentUser}" th:href="${dashView}">Dashboard <span class="sr-only">(current)</span></a>
                     </li>
                 </ul>
                 <ul class="navbar-nav ml-auto">

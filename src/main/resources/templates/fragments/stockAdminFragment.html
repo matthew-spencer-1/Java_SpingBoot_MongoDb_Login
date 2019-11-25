@@ -1,0 +1,32 @@
+<div th:if="${!isFiftyDay && !isIndustry}">
+	<form action="/insertNewStock">
+		<button class="btn btn-sm btn-success" type="submit">Insert New Stock</button>
+	</form>
+	<form action="/UploadCsvFile" method="post"
+		enctype="multipart/form-data">
+		<b>Upload New Stock Data (CSV) &nbsp;</b> 
+		<input type="hidden" name="fromWeb" value="true"> 
+		<input type="file" name="file" accept="*.csv">
+		<button class="btn btn-sm btn-primary" type="submit">Upload File</button>		
+	</form><br>
+	<form action="/UploadFile" method="post"
+		enctype="multipart/form-data">
+		<b>Upload New Stock Data (JSON)</b> 
+		<input type="hidden" name="fromWeb" value="true"> 
+		<input type="file" name="file" accept="*.json">
+		<button class="btn btn-sm btn-primary" type="submit">Upload File</button>		
+	</form>
+	<hr>
+	<form action="/updateStock">
+		<b>Update Existing Stock Information</b><br /> Stock Ticker: 
+		<input type="text" name="ticker">
+		<button class="btn btn-sm btn-primary" type="submit">Update Stock</button>
+	</form><br>
+	<form action="/delete">
+		<b>Delete Existing Stock Information</b><br> Stock Ticker: 
+		<input type="hidden" name="fromWeb" value="true">
+		<input type="text" name="Ticker">
+		<button class="btn btn-sm btn-primary" type="submit">Delete Stock</button>
+	</form>
+</div>
+<hr>

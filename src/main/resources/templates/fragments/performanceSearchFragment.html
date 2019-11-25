@@ -1,0 +1,38 @@
+<div th:if="${!isFiftyDay && !industries.empty}">
+	<form action="/industryPerformance">
+		<b>Year to Date Industry Performance Search</b><br /> 
+			<select name="industry">
+			<option th:if="${industry == null}"
+				th:selected="${industry == null}">Select Industry</option>
+			<option th:each="i: ${industries}" th:value="${i}" th:text="${i}"
+				th:selected="(${i == industry})"></option>
+		</select>
+		<select name="performers">
+			<option value="5" title="Top 5 Performers"
+				th:selected="${performers == 5}">Top 5 Performers</option>
+			<option value="10" title="Top 10 Performers">Top 10
+				Performers</option>
+		</select> 
+		<button class="btn btn-sm btn-primary" type="submit">Search Performers</button>
+	</form>
+</div><br>
+<div th:if="${!isIndustry}">
+	<form action="/fiftyDayMovingAverage">
+		<b>Search 50-Day Simple Moving Average</b><br />
+		Lower Bound for Range: <input type="text" name="lowerBound" th:value="${lowerBound}">
+		Upper Bound For Range: <input type="text" name="upperBound" th:value="${upperBound}"> 
+		<button class="btn btn-sm btn-primary" type="submit">Search 50-Day SMA</button>	
+	</form>
+</div><br>
+<div th:if="${!isFiftyDay && !isIndustry && !sectors.empty}">
+	<form action="/sectorOutstandingShares">
+		<b>Search Outstanding Shares by Sector</b><br /> <select
+			name="sector">
+			<option th:if="${sector == null}" th:selected="${sector == null}">Select
+				Sector</option>
+			<option th:each="i: ${sectors}" th:value="${i}" th:text="${i}"
+				th:selected="(${i == sector})"></option>
+		</select> 
+		<button class="btn btn-sm btn-primary" type="submit">Search Outstanding Shares</button>
+	</form>
+</div><hr>

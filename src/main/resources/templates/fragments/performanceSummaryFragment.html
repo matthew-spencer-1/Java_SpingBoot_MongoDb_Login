@@ -1,0 +1,24 @@
+<div th:if="${stocks != null}">
+	<table>
+		<thead style="font-weight: bold; background:">
+			<tr>
+				<td></td>
+				<td>Stock Ticker</td>
+				<td>Company Name</td>
+				<td>YTD Performance</td>
+				<td>Current Price</td>
+				<td th:if="${isFiftyDay}">50-Day SMA</td>
+			</tr>
+		</thead>
+		<tr th:each="stock, iStat : ${stocks}"
+			th:style="${iStat.odd}? 'background-color: #A0CFEC'">
+			<td th:text="${iStat.index}+1">.&nbsp;</td>
+			<td th:text="${stock.ticker}" />
+			<td th:text="${stock.companyName}" />
+			<td th:text="${stock.performanceYTD}" />
+			<td th:text="${stock.price}" />
+			<td th:if="${isFiftyDay}"
+				th:text="${stock.simpleMovingAverage50day}" />
+		</tr>
+	</table>
+</div>
