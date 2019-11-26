@@ -6,6 +6,7 @@
 package com.ms_snhu.springbootmongodbsecurity.config;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
@@ -29,6 +30,10 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Autowired
     private BCryptPasswordEncoder bCryptPasswordEncoder;
+    @Value("${webSecurity.adminRoleName}")
+    private String adminRole;
+    @Value("${webSecurity.userRoleName}")
+    private String userRole;
 
     @Autowired
     CustomizeAuthenticationSuccessHandler customizeAuthenticationSuccessHandler;
@@ -54,9 +59,13 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/").permitAll()
                 .antMatchers("/login").permitAll()
                 .antMatchers("/signup").permitAll()
-                .antMatchers("/userView/**").hasAuthority("USER")
-                .antMatchers("/sectorOutstandingShares").hasAnyAuthority("USER","ADMIN")
-                .antMatchers("/dashboard/**").hasAuthority("ADMIN").anyRequest()
+                .antMatchers("/pullAll").permitAll()
+                .antMatchers("/ticker/**").permitAll()
+                .antMatchers("/company/**").permitAll()
+                .antMatchers("/topFive/**").permitAll()
+                .antMatchers("/userView/**").hasAuthority(userRole)
+                .antMatchers("/sectorOutstandingShares").hasAnyAuthority(userRole,adminRole)
+                .antMatchers("/dashboard/**").hasAuthority(adminRole).anyRequest()
                 .authenticated().and().csrf().disable().formLogin().successHandler(customizeAuthenticationSuccessHandler)
                 .loginPage("/login").failureUrl("/login?error=true")
                 .usernameParameter("email")

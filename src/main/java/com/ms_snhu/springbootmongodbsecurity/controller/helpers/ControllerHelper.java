@@ -18,6 +18,7 @@ import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
@@ -44,6 +45,8 @@ public class ControllerHelper {
   private CustomUserDetailsService userService;
   @Autowired
   private RoleRepository           roleRpository;
+  @Value("${webSecurity.adminRoleName}")
+  private String adminRole;
 
   /**
    * convertIterableToList converts an Itereable of a Type to a List of the same
@@ -100,7 +103,7 @@ public class ControllerHelper {
   }
 
   public Boolean isUserAdmin(User user) {
-    return user.getRoles().contains(roleRpository.findByRole("ADMIN"));
+    return user.getRoles().contains(roleRpository.findByRole(adminRole));
   }
 
   /**
