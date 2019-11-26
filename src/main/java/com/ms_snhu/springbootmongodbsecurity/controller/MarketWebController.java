@@ -22,6 +22,8 @@ import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -33,6 +35,7 @@ import com.ms_snhu.springbootmongodbsecurity.domain.SectorIndustryOutstandingSha
 import com.ms_snhu.springbootmongodbsecurity.domain.Stocks;
 import com.ms_snhu.springbootmongodbsecurity.domain.User;
 import com.ms_snhu.springbootmongodbsecurity.repository.MarketRepository;
+import com.ms_snhu.springbootmongodbsecurity.repository.UserRepository;
 
 /**
  * Controller Class for HTTP web services
@@ -51,6 +54,8 @@ public class MarketWebController {
   private ControllerHelper marketHelper;
   @Autowired
   private MarketRepository marketRepository;
+  @Autowired
+  private UserRepository userRepository;
 
   @Value("${snhu.dateFormat}")
   private String dateFormat;
@@ -226,7 +231,37 @@ public class MarketWebController {
 
     return "outstandingShares.html";
   }
+  
+  @GetMapping("/userAdmin")
+  public ModelAndView userAdministration() {
+    User user = marketHelper.getAuthenticatedUser();
+    List<User> registeredUsers = userRepository.findAll();
 
+    ModelAndView mv = new ModelAndView();
+    mv.addObject("currentUser", user);
+    mv.addObject("fullName", user.getFullname());
+    mv.addObject("dashView", adminDash);
+    mv.addObject("regUsers", registeredUsers);
+    
+    mv.setViewName("userAdmin");
+    return mv;
+  }
+  
+  @PostMapping("/userAdmin")
+  public ModelAndView updateUser(@RequestParam(name="regUser", required=true) String userEmail) {
+    User authenticatedUser = marketHelper.getAuthenticatedUser();
+    User registeredUser = userRepository.findByEmail(userEmail);
+
+    ModelAndView mv = new ModelAndView();
+    mv.addObject("currentUser", authenticatedUser);
+    mv.addObject("fullName", authenticatedUser.getFullname());
+    mv.addObject("dashView", adminDash);
+    
+    mv.addObject("regUser", registeredUser);
+    mv.setViewName("userAdmin");
+    return mv;
+  }
+   
   /**
    * method to facilitate the uploading of data contained in csv files to the stocks collection
    * 

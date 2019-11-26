@@ -34,6 +34,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     private String adminRole;
     @Value("${webSecurity.userRoleName}")
     private String userRole;
+    @Value("${webSecurity.restRoleName}")
+    private String restRole;
 
     @Autowired
     CustomizeAuthenticationSuccessHandler customizeAuthenticationSuccessHandler;
@@ -63,9 +65,16 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/ticker/**").permitAll()
                 .antMatchers("/company/**").permitAll()
                 .antMatchers("/topFive/**").permitAll()
+                .antMatchers("/delete/**").hasAnyAuthority(adminRole,restRole)
+                .antMatchers("/Update/**").hasAnyAuthority(adminRole,restRole)
+                .antMatchers("/Insert/**").hasAnyAuthority(adminRole,restRole)
+                .antMatchers("/UploadFile/**").hasAnyAuthority(adminRole,restRole)
+                .antMatchers("/InsertMultiple/**").hasAnyAuthority(restRole)
+                .antMatchers("/UpdateVolume/**").hasAnyAuthority(restRole)
                 .antMatchers("/userView/**").hasAuthority(userRole)
                 .antMatchers("/sectorOutstandingShares").hasAnyAuthority(userRole,adminRole)
-                .antMatchers("/dashboard/**").hasAuthority(adminRole).anyRequest()
+                .antMatchers("/dashboard/**").hasAuthority(adminRole)
+                .antMatchers("/userAdmin/**").hasAuthority(adminRole).anyRequest()
                 .authenticated().and().csrf().disable().formLogin().successHandler(customizeAuthenticationSuccessHandler)
                 .loginPage("/login").failureUrl("/login?error=true")
                 .usernameParameter("email")

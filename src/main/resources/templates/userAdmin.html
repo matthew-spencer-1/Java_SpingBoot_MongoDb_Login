@@ -8,5 +8,33 @@
 </head>
 <body>
 	<div layout:fragment="content">
+		<form th:if="${regUser == null}" action="/userAdmin" method="post">
+			<select name="regUser">
+				<option th:if="${regUser == null}"
+					th:selected="${regUser == null}">Select Registered User</option>
+				<option th:each="i: ${regUsers}" th:value="${i.email}" th:text="${i.fullname + ' / ' + i.email }"
+					th:selected="(${i == regUser})"></option>
+			</select>
+			<button class="btn btn-sm btn-primary" type="submit">Update User</button>
+		</form>
+		<form th:if="${regUser != null}" action="saveUserChange">
+			<table>
+				<tr>
+					<th>Full Name</th>
+					<th>e-mail</th>
+					<th>Admin</th>
+					<th>User</th>
+					<th>RestFul<th>
+				</tr>
+				<tr>
+					<td th:text="${regUser.fullname}"></td>
+					<td th:text="${regUser.email}"></td>
+					<td style="text-align:center"><input type="checkbox" name="accessAdmin" value="Admin" ></td>
+					<td style="text-align:center"><input type="checkbox" name="accessUser" value="User"></td>
+					<td style="text-align:center"><input type="checkbox" name="accessRest" value="Rest"></td>
+				</tr>
+			</table>
+			<button class="btn btn-sm btn-primary" type="submit">Save User</button>
+		</form>
 	</div>
 </body>

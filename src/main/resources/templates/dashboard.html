@@ -10,7 +10,7 @@
 	<div layout:fragment="content">
 		<h1 th:inline="text">Hello [[${fullName}]]!</h1>
 		<h2 th:if="${!isFiftyDay && !isIndustry}">This is your Admin Dashboard</h2>
-
+		<div th:replace="~{/fragments/userAdminFragment}"></div>
 		<div th:replace="~{/fragments/stockAdminFragment}"></div>
 		<div th:replace="~{/fragments/performanceSearchFragment}"></div>
 		<div th:replace="~{/fragments/performanceSummaryFragment}"></div>

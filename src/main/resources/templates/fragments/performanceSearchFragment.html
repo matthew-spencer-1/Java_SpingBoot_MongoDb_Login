@@ -1,7 +1,7 @@
 <div th:if="${!isFiftyDay && !industries.empty}">
 	<form action="/industryPerformance">
 		<b>Year to Date Industry Performance Search</b><br /> 
-			<select name="industry">
+		<select name="industry">
 			<option th:if="${industry == null}"
 				th:selected="${industry == null}">Select Industry</option>
 			<option th:each="i: ${industries}" th:value="${i}" th:text="${i}"
