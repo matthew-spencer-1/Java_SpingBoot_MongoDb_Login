@@ -30,10 +30,12 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
 
 import com.ms_snhu.springbootmongodbsecurity.controller.helpers.ControllerHelper;
+import com.ms_snhu.springbootmongodbsecurity.domain.Role;
 import com.ms_snhu.springbootmongodbsecurity.domain.SectorIndustryOutstandingShares;
 import com.ms_snhu.springbootmongodbsecurity.domain.Stocks;
 import com.ms_snhu.springbootmongodbsecurity.domain.User;
 import com.ms_snhu.springbootmongodbsecurity.repository.MarketRepository;
+import com.ms_snhu.springbootmongodbsecurity.repository.RoleRepository;
 import com.ms_snhu.springbootmongodbsecurity.repository.UserRepository;
 
 /**
@@ -55,6 +57,8 @@ public class MarketWebController {
   private MarketRepository marketRepository;
   @Autowired
   private UserRepository userRepository;
+  @Autowired
+  private RoleRepository roleRepository;
 
   @Value("${snhu.dateFormat}")
   private String dateFormat;
@@ -250,6 +254,7 @@ public class MarketWebController {
   public ModelAndView updateUser(@RequestParam(name="regUser", required=true) String userEmail) {
     User authenticatedUser = marketHelper.getAuthenticatedUser();
     User registeredUser = userRepository.findByEmail(userEmail);
+    List<Role> roles = roleRepository.findAll();
 
     ModelAndView mv = new ModelAndView();
     mv.addObject("currentUser", authenticatedUser);
@@ -257,7 +262,27 @@ public class MarketWebController {
     mv.addObject("dashView", adminDash);
     
     mv.addObject("regUser", registeredUser);
+    mv.addObject("roles", roles);
     mv.setViewName("userAdmin");
+    return mv;
+  }
+  
+  @PostMapping("/saveUserChange")
+  public ModelAndView saveUserChange(@RequestParam(name="regUser", required=true) String userEmail, 
+      @RequestParam(name="roles", required=true) String[] rolesUpdates ) {
+    
+    marketHelper.saveUserRolesUpdate(userEmail, rolesUpdates);
+    
+    User authenticatedUser = marketHelper.getAuthenticatedUser(); 
+    List<User> registeredUsers = userRepository.findAll();
+    
+    ModelAndView mv = new ModelAndView();
+    mv.addObject("currentUser", authenticatedUser);
+    mv.addObject("fullName", authenticatedUser.getFullname());
+    mv.addObject("dashView", adminDash);    
+    mv.addObject("regUsers", registeredUsers);
+    mv.setViewName("userAdmin");
+    
     return mv;
   }
    

@@ -17,24 +17,24 @@
 			</select>
 			<button class="btn btn-sm btn-primary" type="submit">Update User</button>
 		</form>
-		<form th:if="${regUser != null}" action="saveUserChange">
-			<table>
+		<form th:if="${regUser != null}" action="saveUserChange" method="post">
+			<table class="userAdminTable">
 				<tr>
 					<th>Full Name</th>
 					<th>e-mail</th>
-					<th>Admin</th>
-					<th>User</th>
-					<th>RestFul<th>
+					<th th:each="role:${roles}" style="text-align:center" th:text="${role.role}"></th>
 				</tr>
 				<tr>
 					<td th:text="${regUser.fullname}"></td>
 					<td th:text="${regUser.email}"></td>
-					<td style="text-align:center"><input type="checkbox" name="accessAdmin" value="Admin" ></td>
-					<td style="text-align:center"><input type="checkbox" name="accessUser" value="User"></td>
-					<td style="text-align:center"><input type="checkbox" name="accessRest" value="Rest"></td>
+					<td th:each="role:${roles}" style="text-align:center"><input type="checkbox" name="roles" th:value="${role.role}" th:checked="${#lists.contains(regUser.roles,role)}"></td>
 				</tr>
 			</table>
-			<button class="btn btn-sm btn-primary" type="submit">Save User</button>
+			<div>
+				<input type="hidden" th:value="${regUser.email}" name="regUser">
+				<button class="btn btn-primary" type="submit">Save User</button>
+				<button class="btn btn-success" onclick="window.location.href='/userAdmin';">Cancel</button>
+			</div>
 		</form>
 	</div>
 </body>

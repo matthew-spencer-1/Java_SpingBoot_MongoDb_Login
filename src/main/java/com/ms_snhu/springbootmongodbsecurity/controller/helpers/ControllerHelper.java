@@ -27,9 +27,11 @@ import org.springframework.util.StringUtils;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ms_snhu.springbootmongodbsecurity.domain.Role;
 import com.ms_snhu.springbootmongodbsecurity.domain.Stocks;
 import com.ms_snhu.springbootmongodbsecurity.domain.User;
 import com.ms_snhu.springbootmongodbsecurity.repository.RoleRepository;
+import com.ms_snhu.springbootmongodbsecurity.repository.UserRepository;
 import com.ms_snhu.springbootmongodbsecurity.service.CustomUserDetailsService;
 
 /**
@@ -44,9 +46,11 @@ public class ControllerHelper {
   @Autowired
   private CustomUserDetailsService userService;
   @Autowired
-  private RoleRepository           roleRpository;
+  private RoleRepository           roleRepository;
+  @Autowired
+  private UserRepository           userRepository;
   @Value("${webSecurity.adminRoleName}")
-  private String adminRole;
+  private String                   adminRole;
 
   /**
    * convertIterableToList converts an Itereable of a Type to a List of the same
@@ -103,7 +107,37 @@ public class ControllerHelper {
   }
 
   public Boolean isUserAdmin(User user) {
-    return user.getRoles().contains(roleRpository.findByRole(adminRole));
+    return user.getRoles().contains(roleRepository.findByRole(adminRole));
+  }
+
+  /**
+   * Helper method to parse web for data and save the changes to the user's roles
+   * Because I'm lazy and didn't create an FBO
+   * @param userEmail
+   * @param userRoleNames
+   */
+  public void saveUserRolesUpdate(String userEmail, String[] userRoleNames) {
+
+    User registeredUser = userRepository.findByEmail(userEmail);
+    List<Role> userRoles = new ArrayList<Role>();
+
+    for (String roleName : userRoleNames) {
+      userRoles.add(roleRepository.findByRole(roleName));
+    }
+
+    for (Role role : userRoles) {
+      if (!registeredUser.getRoles().contains(role)) {
+        registeredUser.getRoles().add(role);
+      }
+    }
+
+    for (Role role : registeredUser.getRoles()) {
+      if (!userRoles.contains(role)) {
+        registeredUser.getRoles().remove(role);
+      }
+    }
+
+    userRepository.save(registeredUser);
   }
 
   /**

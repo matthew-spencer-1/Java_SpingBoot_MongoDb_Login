@@ -74,6 +74,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/userView/**").hasAuthority(userRole)
                 .antMatchers("/sectorOutstandingShares").hasAnyAuthority(userRole,adminRole)
                 .antMatchers("/dashboard/**").hasAuthority(adminRole)
+                .antMatchers("/saveUserChange/**").hasAuthority(adminRole)
                 .antMatchers("/userAdmin/**").hasAuthority(adminRole).anyRequest()
                 .authenticated().and().csrf().disable().formLogin().successHandler(customizeAuthenticationSuccessHandler)
                 .loginPage("/login").failureUrl("/login?error=true")
