@@ -16,6 +16,7 @@ import org.springframework.data.mongodb.core.aggregation.Aggregation;
 import org.springframework.data.mongodb.core.aggregation.AggregationResults;
 import org.springframework.data.mongodb.core.aggregation.GroupOperation;
 import org.springframework.data.mongodb.core.aggregation.MatchOperation;
+import org.springframework.data.mongodb.core.aggregation.SortOperation;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.http.MediaType;
@@ -56,15 +57,15 @@ public class MarketWebController {
   @Autowired
   private MarketRepository marketRepository;
   @Autowired
-  private UserRepository userRepository;
+  private UserRepository   userRepository;
   @Autowired
-  private RoleRepository roleRepository;
+  private RoleRepository   roleRepository;
 
   @Value("${snhu.dateFormat}")
   private String dateFormat;
- 
+
   private String adminDash = "dashboard";
-  private String userDash = "userView";
+  private String userDash  = "userView";
 
   @GetMapping(value = {"/dashboard", "/userView"})
   public ModelAndView dashboard() {
@@ -85,7 +86,7 @@ public class MarketWebController {
     modelAndView.addObject("isIndustry", false);
     if (marketHelper.isUserAdmin(user)) {
       modelAndView.addObject("dashView", adminDash);
-      modelAndView.setViewName( adminDash);
+      modelAndView.setViewName(adminDash);
     }
     else {
       modelAndView.addObject("dashView", userDash);
@@ -116,10 +117,10 @@ public class MarketWebController {
 
     modelAndView.addObject("isIndustry", true);
     modelAndView.addObject("isFiftyDay", false);
-    
+
     if (marketHelper.isUserAdmin(user)) {
       modelAndView.addObject("dashView", adminDash);
-      modelAndView.setViewName( adminDash);
+      modelAndView.setViewName(adminDash);
     }
     else {
       modelAndView.addObject("dashView", userDash);
@@ -149,7 +150,7 @@ public class MarketWebController {
     modelAndView.addObject("isIndustry", false);
     if (marketHelper.isUserAdmin(user)) {
       modelAndView.addObject("dashView", adminDash);
-      modelAndView.setViewName( adminDash);
+      modelAndView.setViewName(adminDash);
     }
     else {
       modelAndView.addObject("dashView", userDash);
@@ -190,7 +191,7 @@ public class MarketWebController {
     model.addAttribute("insertUpdate", "Update");
     model.addAttribute("fullName", user.getFullname());
     model.addAttribute("dashView", adminDash);
-    
+
     return "insertUpdate.html";
   }
 
@@ -204,22 +205,37 @@ public class MarketWebController {
    * @return
    */
   @GetMapping("/sectorOutstandingShares")
-  private String sectorAggregation(@RequestParam(name = "sector", required = true) String sectorName, Model model) {
+  private String sectorAggregation(@RequestParam(name = "sector", required = true) String sectorName, @RequestParam(name = "sortField", required = false) String sortField,
+      @RequestParam(name = "sortDirection", required = false) Sort.Direction direction, Model model) {
     String stocksCollectionName = marketTemplate.getCollectionName(Stocks.class);
 
     /* Create the match Operation */
     MatchOperation sectorMatchOp = Aggregation.match(new Criteria("Sector").is(sectorName));
     /* Create the group Operation */
     GroupOperation industryGroupOp = Aggregation.group("Industry").sum("Shares Outstanding").as("total");
+    SortOperation displaySort = marketHelper.getStockSort(sortField, direction);
 
     /* Create the aggregation combining the mating and grouping operations */
-    Aggregation sectorIndustryAggregation = Aggregation.newAggregation(sectorMatchOp, industryGroupOp);
-
+    Aggregation sectorIndustryAggregation = Aggregation.newAggregation(sectorMatchOp, industryGroupOp, displaySort);
     /* Run the Aggregation */
     AggregationResults<SectorIndustryOutstandingShares> aggResults = marketTemplate.aggregate(sectorIndustryAggregation, stocksCollectionName, SectorIndustryOutstandingShares.class);
+
     List<SectorIndustryOutstandingShares> sharesResults = aggResults.getMappedResults();
 
     User user = marketHelper.getAuthenticatedUser();
+
+    if (null == direction) {
+      model.addAttribute("sortDir", Sort.Direction.ASC);
+      model.addAttribute("sortDirStr", "");
+    }
+    else if (Sort.Direction.ASC.equals(direction)) {
+      model.addAttribute("sortDir", Sort.Direction.DESC);
+      model.addAttribute("sortDirStr", Sort.Direction.DESC.toString());
+    }
+    else {
+      model.addAttribute("sortDir", Sort.Direction.ASC);
+      model.addAttribute("sortDirStr", Sort.Direction.ASC.toString());
+    }
 
     model.addAttribute("currentUser", user);
     model.addAttribute("sectorName", sectorName);
@@ -234,7 +250,7 @@ public class MarketWebController {
 
     return "outstandingShares.html";
   }
-  
+
   @GetMapping("/userAdmin")
   public ModelAndView userAdministration() {
     User user = marketHelper.getAuthenticatedUser();
@@ -245,13 +261,13 @@ public class MarketWebController {
     mv.addObject("fullName", user.getFullname());
     mv.addObject("dashView", adminDash);
     mv.addObject("regUsers", registeredUsers);
-    
+
     mv.setViewName("userAdmin");
     return mv;
   }
-  
+
   @PostMapping("/userAdmin")
-  public ModelAndView updateUser(@RequestParam(name="regUser", required=true) String userEmail) {
+  public ModelAndView updateUser(@RequestParam(name = "regUser", required = true) String userEmail) {
     User authenticatedUser = marketHelper.getAuthenticatedUser();
     User registeredUser = userRepository.findByEmail(userEmail);
     List<Role> roles = roleRepository.findAll();
@@ -260,32 +276,31 @@ public class MarketWebController {
     mv.addObject("currentUser", authenticatedUser);
     mv.addObject("fullName", authenticatedUser.getFullname());
     mv.addObject("dashView", adminDash);
-    
+
     mv.addObject("regUser", registeredUser);
     mv.addObject("roles", roles);
     mv.setViewName("userAdmin");
     return mv;
   }
-  
+
   @PostMapping("/saveUserChange")
-  public ModelAndView saveUserChange(@RequestParam(name="regUser", required=true) String userEmail, 
-      @RequestParam(name="roles", required=true) String[] rolesUpdates ) {
-    
+  public ModelAndView saveUserChange(@RequestParam(name = "regUser", required = true) String userEmail, @RequestParam(name = "roles", required = true) String[] rolesUpdates) {
+
     marketHelper.saveUserRolesUpdate(userEmail, rolesUpdates);
-    
-    User authenticatedUser = marketHelper.getAuthenticatedUser(); 
+
+    User authenticatedUser = marketHelper.getAuthenticatedUser();
     List<User> registeredUsers = userRepository.findAll();
-    
+
     ModelAndView mv = new ModelAndView();
     mv.addObject("currentUser", authenticatedUser);
     mv.addObject("fullName", authenticatedUser.getFullname());
-    mv.addObject("dashView", adminDash);    
+    mv.addObject("dashView", adminDash);
     mv.addObject("regUsers", registeredUsers);
     mv.setViewName("userAdmin");
-    
+
     return mv;
   }
-   
+
   /**
    * method to facilitate the uploading of data contained in csv files to the stocks collection
    * 

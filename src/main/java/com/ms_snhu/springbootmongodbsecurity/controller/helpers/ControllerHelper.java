@@ -19,6 +19,9 @@ import org.apache.commons.csv.CSVRecord;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.mongodb.core.aggregation.Aggregation;
+import org.springframework.data.mongodb.core.aggregation.SortOperation;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
@@ -92,6 +95,26 @@ public class ControllerHelper {
     }
 
     return stockRecords;
+  }
+
+  /**
+   * creates and returns a MongoDB sort operation based on the passed paramters.
+   * Defaults to no Sort
+   * 
+   * @param sortField
+   * @param direction
+   * @return
+   */
+  public SortOperation getStockSort(String sortField, Sort.Direction direction) {
+    SortOperation sortOp = null;
+    if (null == sortField) {
+      sortOp = Aggregation.sort(new Sort(Sort.DEFAULT_DIRECTION, "Industry"));
+    }
+    else {
+      sortOp = Aggregation.sort(new Sort(direction, sortField));
+    }
+
+    return sortOp;
   }
 
   /**

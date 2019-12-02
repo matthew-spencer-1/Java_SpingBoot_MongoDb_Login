@@ -13,6 +13,7 @@ import org.springframework.data.mongodb.core.mapping.Field;
 public class SectorIndustryOutstandingShares {
 
 	@Id
+	@Field("name")
 	/* The industry Name */
 	private String _id;
 
